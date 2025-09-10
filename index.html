@@ -1,11 +1,72 @@
 <!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <base target="_top" />
+  <title>Embedded Google Apps Script</title>
+  <style>
+    html,body { height:100%; margin:0; font-family:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+    .frame-wrapper { position:relative; height:100vh; }
+    iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
+    .fallback {
+      display:none;
+      padding:24px;
+      box-sizing:border-box;
+      width:100%;
+      height:100%;
+      background:#f8f9fa;
+      color:#222;
+    }
+    .fallback.visible { display:block; }
+    .center { display:flex; align-items:center; justify-content:center; height:100%; text-align:center; }
+    .btn { display:inline-block; margin-top:12px; padding:8px 14px; border-radius:8px; text-decoration:none; border:1px solid #ccc; background:white; color:#111; }
+  </style>
+</head>
+<body>
+  <div class="frame-wrapper" id="wrapper">
+    <iframe
+      id="appFrame"
+      title="Google Apps Script Web App"
+      src="https://script.google.com/macros/s/AKfycbyNnqHd2tzgNDS3GVi1sgBWotDSIs110KkBvKzQNS5hKB-egpwbXGAA3z2tYDUUgwLEkw/exec"
+      loading="lazy"
+      allowfullscreen
+      sandbox="allow-scripts allow-same-origin allow-forms allow-popups">
+    </iframe>
 
-<html>
-   <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-      <base target="_top">
-   </head>
-   <body>
-      <iframe style="position: absolute;top: 0;left: 0;width: 100%;height: 100%;border: 0;" src="https://script.google.com/macros/s/AKfycbwl3dzHxMV0-BdNfJHR3LU1hI4eKGqIQIoGztZW_RkRpBHxK1wyNH4D3yoU9BiSBjr4/exec"></iframe>
-   </body>
+    <div class="fallback" id="fallback">
+      <div class="center">
+        <div>
+          <h2>ไม่สามารถโหลดหน้าเว็บภายใน iframe ได้</h2>
+          <p>เว็บที่พยายามฝังอาจตั้งค่าไม่ให้ฝังใน iframe หรือมีนโยบายความปลอดภัยบางอย่าง</p>
+          <p><a id="openLink" class="btn" target="_blank" rel="noopener noreferrer">เปิดหน้าเว็บในแท็บใหม่</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ถ้า iframe ถูกบล็อก (เช่น ถูกตั้ง X-Frame-Options) เราจะตรวจจับโดย timeout และแสดง fallback
+    (function(){
+      const iframe = document.getElementById('appFrame');
+      const fallback = document.getElementById('fallback');
+      const openLink = document.getElementById('openLink');
+      const src = iframe.src;
+      openLink.href = src;
+
+      // ตรวจจับการโหลด (onload) -- ถ้าไม่เกิด onload ภายในเวลา ให้แสดง fallback
+      let loaded = false;
+      iframe.addEventListener('load', () => { loaded = true; });
+
+      setTimeout(() => {
+        if (!loaded) {
+          // แสดง fallback
+          fallback.classList.add('visible');
+          // ซ่อน iframe เพื่อหลีกเลี่ยงพื้นที่ว่างหรือข้อความบล็อก
+          iframe.style.display = 'none';
+        }
+      }, 3000); // รอ 3 วินาที (เปลี่ยนตามต้องการ)
+    })();
+  </script>
+</body>
 </html>
